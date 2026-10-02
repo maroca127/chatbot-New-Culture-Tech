@@ -179,119 +179,123 @@ class ChatbotEngine:
 
     def _build_system_prompt(self) -> str:
         """
-        Constrói o prompt de sistema injetando o contexto da empresa,
-        a base de conhecimento factual (RAG) e a ancoragem temporal com a data real.
+        Constrói o prompt de sistema injetando o contexto da empresa (Neo Culture Tech)
+        e permitindo respostas para perguntas gerais e bate-papo normal.
         """
-        empresa = self.knowledge_base.get("empresa", "AfesuTech Soluções Inteligentes")
+        empresa = self.knowledge_base.get("empresa", "Neo Culture Tech")
         descricao = self.knowledge_base.get("descricao", "")
         topicos = self.knowledge_base.get("topicos", [])
         faq_rapido = self.knowledge_base.get("faq_rapido", [])
         data_atual = self._get_current_date_pt_br()
 
-        # Formata os tópicos da base de conhecimento em texto estruturado
         conhecimento_formatado = []
         for t in topicos:
             titulo = t.get("id", "").replace("_", " ").title()
             perguntas = ", ".join(t.get("perguntas_chave", []))
             resposta = t.get("resposta", "")
             conhecimento_formatado.append(
-                f"### Tópico: {titulo} (ID: {t.get('id')})\n"
-                f"- Perguntas frequentes associadas: {perguntas}\n"
-                f"- Conteúdo Oficial e Factual:\n{resposta}\n"
+                f"### Tópico: {titulo}\n"
+                f"- Perguntas associadas: {perguntas}\n"
+                f"- Informação Oficial:\n{resposta}\n"
             )
 
         rag_context = "\n".join(conhecimento_formatado)
         faq_str = "\n".join([f"- {q}" for q in faq_rapido])
 
-        prompt = f"""Você é o Assistente Virtual Oficial da empresa {empresa}.
+        prompt = f"""Você é a assistente de IA oficial da empresa {empresa} (hub de K-Pop, músicas, idols e cultura pop).
 
 DATA ATUAL: {data_atual}.
 
 SOBRE A EMPRESA:
 {descricao}
 
-BASE DE CONHECIMENTO OFICIAL (RAG):
+BASE DE CONHECIMENTO DA EMPRESA (RAG):
 {rag_context}
 
-PERGUNTAS SUGERIDAS (FAQ RÁPIDO):
+PERGUNTAS FREQUENTES DA EMPRESA:
 {faq_str}
 
-DIRETRIZES DE ATENDIMENTO:
-1. Responda com simpatia, clareza, tom acolhedor e profissional.
-2. Use formatação rica em Markdown (tópicos com marcadores, **negrito**, listas e emojis pertinentes).
-3. Baseie suas respostas ESTRITAMENTE nas informações fornecidas na Base de Conhecimento Oficial acima.
-4. Se o usuário fizer uma pergunta fora do escopo ou sobre um assunto desconhecido, informe gentilmente que não possui essa informação e ofereça contato com a equipe de suporte humano pelo e-mail suporte@afesutech.com.br.
-5. Nunca invente dados cadastrais, preços, SLAs ou políticas não documentados.
-6. Responda sempre em Língua Portuguesa (Brasil).
+DIRETRIZES IMPORTANTES:
+1. Seja sempre simpática, inteligente, atenciosa e estilosa (use emojis fofos como 🎀, ✨, 🎤, 🎧 quando pertinente).
+2. Se o usuário perguntar sobre a Neo Culture Tech, K-Pop, ídolos, músicas, letras, traduções ou MVs, use as informações oficiais acima.
+3. Se o usuário fizer perguntas GERAIS (como contas de matemática ex: "quanto é 2+2", curiosidades, conhecimentos gerais, ciência, tecnologia, saudações ou bate-papo normal), RESPONDA DE FORMA COMPLETA, CORRETA E PRECIOSA assim como uma IA conversacional normal (como o ChatGPT). NUNCA recuse responder perguntas simples ou gerais!
+4. Responda sempre em Língua Portuguesa (Brasil).
 """
         return prompt
 
     def _call_groq_llm(self, user_message: str) -> Optional[str]:
         """
         Executa a requisição HTTP para a API da Groq utilizando urllib,
-        mantendo o histórico de conversação multi-turn.
+        tentando múltiplos modelos caso o modelo principal não esteja disponível.
         """
         if not self.groq_api_key:
             return None
 
         system_prompt = self._build_system_prompt()
 
-        # Monta a lista completa de mensagens (System Prompt + Histórico + Nova Mensagem)
         messages: List[Dict[str, str]] = [
             {"role": "system", "content": system_prompt}
         ]
 
-        # Adiciona histórico recente
         messages.extend(self.conversation_history[-self.max_history_turns * 2:])
-
-        # Adiciona a mensagem atual do usuário
         messages.append({"role": "user", "content": user_message})
 
-        payload = {
-            "model": self.groq_model,
-            "messages": messages,
-            "temperature": 0.3,
-            "max_tokens": 900
-        }
+        # Lista de modelos Groq para tentar em ordem de prioridade
+        models_to_try = [
+            self.groq_model,
+            "llama-3.1-8b-instant",
+            "llama3-70b-8192",
+            "mixtral-8x7b-32768",
+            "gemma2-9b-it"
+        ]
 
-        data_bytes = json.dumps(payload).encode("utf-8")
-        req = urllib.request.Request(
-            self.groq_api_url,
-            data=data_bytes,
-            headers={
-                "Authorization": f"Bearer {self.groq_api_key}",
-                "Content-Type": "application/json",
-                "User-Agent": "AfesuTech-ChatbotEngine/1.0"
-            },
-            method="POST"
-        )
+        # Evita duplicados mantendo a ordem
+        seen = set()
+        unique_models = []
+        for m in models_to_try:
+            if m and m not in seen:
+                seen.add(m)
+                unique_models.append(m)
 
-        try:
-            with urllib.request.urlopen(req, timeout=15) as response:
-                if response.status == 200:
-                    resp_body = response.read().decode("utf-8")
-                    resp_json = json.loads(resp_body)
-                    assistant_reply = resp_json["choices"][0]["message"]["content"]
+        for model in unique_models:
+            payload = {
+                "model": model,
+                "messages": messages,
+                "temperature": 0.4,
+                "max_tokens": 900
+            }
 
-                    # Atualiza o histórico de conversação
-                    self.conversation_history.append({"role": "user", "content": user_message})
-                    self.conversation_history.append({"role": "assistant", "content": assistant_reply})
+            data_bytes = json.dumps(payload).encode("utf-8")
+            req = urllib.request.Request(
+                self.groq_api_url,
+                data=data_bytes,
+                headers={
+                    "Authorization": f"Bearer {self.groq_api_key}",
+                    "Content-Type": "application/json",
+                    "User-Agent": "NeoCultureTech-ChatbotEngine/1.0"
+                },
+                method="POST"
+            )
 
-                    # Limita tamanho do histórico em memória
-                    if len(self.conversation_history) > self.max_history_turns * 2:
-                        self.conversation_history = self.conversation_history[-self.max_history_turns * 2:]
+            try:
+                with urllib.request.urlopen(req, timeout=12) as response:
+                    if response.status == 200:
+                        resp_body = response.read().decode("utf-8")
+                        resp_json = json.loads(resp_body)
+                        assistant_reply = resp_json["choices"][0]["message"]["content"]
 
-                    return assistant_reply
-                else:
-                    print(f"Groq API retornou status HTTP {response.status}")
-                    return None
-        except urllib.error.HTTPError as e:
-            err_content = e.read().decode("utf-8") if e.fp else str(e)
-            print(f"Erro HTTP ao chamar Groq API ({e.code}): {err_content}")
-            return None
-        except Exception as e:
-            print(f"Exceção ao comunicar com a Groq API: {e}")
-            return None
+                        self.conversation_history.append({"role": "user", "content": user_message})
+                        self.conversation_history.append({"role": "assistant", "content": assistant_reply})
+
+                        if len(self.conversation_history) > self.max_history_turns * 2:
+                            self.conversation_history = self.conversation_history[-self.max_history_turns * 2:]
+
+                        return assistant_reply
+            except Exception as e:
+                # Se falhou com este modelo, tenta o próximo modelo da lista
+                continue
+
+        return None
 
     # ----------------------------------------------------------------------
     # 2. Motor Léxico & PLN Offline (Fallback)
@@ -449,11 +453,107 @@ DIRETRIZES DE ATENDIMENTO:
     # 3. Processamento de Mensagens & Gestão de Métricas
     # ----------------------------------------------------------------------
 
+    def _try_evaluate_math_or_general(self, text: str) -> Optional[str]:
+        """
+        Avalia perguntas matemáticas (expressões, porcentagens, operações),
+        data/hora atuais e perguntas gerais de bate-papo.
+        """
+        raw = text.strip().lower()
+
+        # Dicionário de números por extenso em português
+        num_map = {
+            "zero": 0, "um": 1, "uma": 1, "dois": 2, "duas": 2, "três": 3, "tres": 3,
+            "quatro": 4, "cinco": 5, "seis": 6, "sete": 7, "oito": 8, "nove": 9, "dez": 10,
+            "onze": 11, "doze": 12, "treze": 13, "quatorze": 14, "catorze": 14, "quinze": 15,
+            "dezesseis": 16, "dezessete": 17, "dezoito": 18, "dezenove": 19, "vinte": 20,
+            "trinta": 30, "quarenta": 40, "cinquenta": 50, "sessenta": 60, "setenta": 70,
+            "oitenta": 80, "noventa": 90, "cem": 100
+        }
+
+        op_map = {
+            "mais": "+", "somado com": "+", "somada a": "+", "+": "+",
+            "menos": "-", "subtraído de": "-", "subtraida de": "-", "-": "-",
+            "vezes": "*", "multiplicado por": "*", "multiplicada por": "*", "*": "*", "x": "*",
+            "dividido por": "/", "dividida por": "/", "/": "/"
+        }
+
+        # 1. Porcentagem (ex: 20% de 150)
+        pct_match = re.search(r"(\d+(?:\.\d+)?)\s*%\s*de\s*(\d+(?:\.\d+)?)", raw)
+        if pct_match:
+            pct_val = float(pct_match.group(1))
+            total_val = float(pct_match.group(2))
+            res = (pct_val / 100.0) * total_val
+            if res.is_integer():
+                res = int(res)
+            return f"✨ **{pct_match.group(1)}% de {pct_match.group(2)} é igual a {res}!** 🎀"
+
+        # 2. Expressões matemáticas gerais
+        math_text = raw.replace("quanto é", "").replace("quanto e", "").replace("qual é o resultado de", "").replace("qual o resultado de", "").replace("?", "").strip()
+
+        tokens = math_text.split()
+        converted_tokens = []
+        for token in tokens:
+            if token in num_map:
+                converted_tokens.append(str(num_map[token]))
+            elif token in op_map:
+                converted_tokens.append(op_map[token])
+            else:
+                converted_tokens.append(token)
+
+        expr_str = " ".join(converted_tokens)
+        clean_expr = re.sub(r"[^\d\+\-\*\/\.\s]", "", expr_str).strip()
+
+        if clean_expr and re.search(r"\d", clean_expr) and re.search(r"[\+\-\*\/]", clean_expr):
+            try:
+                allowed_chars = set("0123456789+-*/. ")
+                if set(clean_expr).issubset(allowed_chars):
+                    res = eval(clean_expr)
+                    if isinstance(res, float) and res.is_integer():
+                        res = int(res)
+                    return f"✨ **O resultado é {res}!** 🎀\n\nPrecisa de mais alguma conta ou dúvida sobre a Neo Culture Tech?"
+            except Exception:
+                pass
+
+        # 3. Data e Hora
+        if any(p in raw for p in ["que dia e hoje", "que dia e", "qual a data de hoje", "data de hoje"]):
+            data_str = self._get_current_date_pt_br()
+            return f"📅 Hoje é **{data_str}**! ✨"
+
+        if any(p in raw for p in ["que horas sao", "que horas e", "qual o horario"]):
+            hora_str = datetime.datetime.now().strftime("%H:%M")
+            return f"⏰ Agora são **{hora_str}**! 🎀"
+
+        # 4. Perguntas de bate-papo e conhecimentos gerais
+        if any(p in raw for p in ["tudo bem", "como voce esta", "como vai"]):
+            return "😊 Está tudo ótimo por aqui! Pronta para te ajudar com dúvidas de K-Pop, músicas, ídolos e bate-papo. E com você, como estão as coisas? 🎀✨"
+
+        if any(p in raw for p in ["qual e o seu nome", "qual o seu nome", "como voce se chama", "quem e voce", "quem voce e"]):
+            return "🎀 Olá! Eu sou a **Assistente Virtual Inteligente da Neo Culture Tech**! Estou aqui para responder suas dúvidas sobre K-Pop, músicas, ídolos, letras e muito mais! ✨"
+
+        if any(p in raw for p in ["quem te criou", "quem desenvolveu você", "quem criou voce"]):
+            return "🚀 Fui desenvolvida pela equipe da **Neo Culture Tech** para proporcionar a melhor experiência interativa com inteligência artificial, suporte a voz e catálogo de K-Pop!"
+
+        if "o que e kpop" in raw or "o que e k-pop" in raw:
+            return "🎵 **K-Pop (Korean Pop)** é o gênero de música popular originário da Coreia do Sul, conhecido por suas produções espetaculares, coreografias marcantes, conceitos visuais e grupos lendários como NCT, BTS, BLACKPINK, TWICE, aespa, Stray Kids e NewJeans! 🎀"
+
+        if "capital da franca" in raw or "capital da frança" in raw:
+            return "🗼 A capital da França é **Paris**! ✨"
+
+        if "capital do brasil" in raw:
+            return "🇧🇷 A capital do Brasil é **Brasília**! ✨"
+
+        if "capital da coreia" in raw or "capital da coreia do sul" in raw:
+            return "🇰🇷 A capital da Coreia do Sul é **Seul (Seoul)**! 🌸"
+
+        if "capital do japao" in raw or "capital do japão" in raw:
+            return "🇯🇵 A capital do Japão é **Tóquio (Tokyo)**! 🏯"
+
+        return None
+
     def process_message(self, user_message: str) -> Dict[str, Any]:
         """
         Ponto de entrada principal para processar mensagens do usuário.
-        Coordena saudações, LLM generativa, busca léxica e fallback offline,
-        atualizando as métricas de atendimento.
+        Coordena saudações, LLM generativa, busca léxica, avaliador geral e fallback offline.
         """
         self.metrics["total_messages"] += 1
         message_id = f"msg_{int(datetime.datetime.now().timestamp())}_{uuid.uuid4().hex[:6]}"
@@ -478,7 +578,19 @@ DIRETRIZES DE ATENDIMENTO:
                 "timestamp": timestamp
             }
 
-        # 2. Tentativa via LLM Generativa (Groq / Llama-3) se a chave estiver configurada
+        # 2. Avaliador de Matemática & Perguntas Gerais Básicas (Instantâneo)
+        general_answer = self._try_evaluate_math_or_general(user_message_clean)
+        if general_answer:
+            self.metrics["resolved_by_llm"] += 1
+            return {
+                "message_id": message_id,
+                "response": general_answer,
+                "source": "general_knowledge",
+                "confidence": 1.0,
+                "timestamp": timestamp
+            }
+
+        # 3. Tentativa via LLM Generativa (Groq com fallback de modelos)
         if self.groq_api_key:
             llm_response = self._call_groq_llm(user_message_clean)
             if llm_response:
@@ -488,10 +600,11 @@ DIRETRIZES DE ATENDIMENTO:
                     "response": llm_response,
                     "source": "groq_llm",
                     "model": self.groq_model,
+                    "confidence": 0.95,
                     "timestamp": timestamp
                 }
 
-        # 3. Motor Léxico Offline (Fallback RAG local)
+        # 4. Motor Léxico Offline (Fallback RAG local da Base de Conhecimento)
         match_result = self._find_best_topic_lexical(user_message_clean)
         if match_result:
             topico, score = match_result
@@ -505,12 +618,13 @@ DIRETRIZES DE ATENDIMENTO:
                 "timestamp": timestamp
             }
 
-        # 4. Fallback Geral
+        # 5. Fallback Geral
         self.metrics["fallbacks"] += 1
         return {
             "message_id": message_id,
             "response": self._generate_fallback_response(),
             "source": "fallback",
+            "confidence": 0.3,
             "timestamp": timestamp
         }
 

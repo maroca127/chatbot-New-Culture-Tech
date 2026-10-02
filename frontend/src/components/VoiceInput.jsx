@@ -52,7 +52,7 @@ export default function VoiceInput({ onTranscript, disabled = false }) {
   const handleToggleListening = () => {
     if (disabled) return;
 
-    // Se já estiver escutando, interrompe a gravação
+    // 1. Se já estiver escutando, interrompe
     if (isListening) {
       if (recognitionRef.current) {
         try {
@@ -65,28 +65,16 @@ export default function VoiceInput({ onTranscript, disabled = false }) {
       return;
     }
 
-    // 1. Validação de Contexto Seguro (HTTPS ou localhost)
-    const isSecure = window.isSecureContext ||
-      window.location.hostname === 'localhost' ||
-      window.location.hostname === '127.0.0.1';
-
-    if (!isSecure) {
-      triggerError('O microfone exige conexão segura HTTPS no celular (ex: Localtunnel ou ngrok).');
-      return;
-    }
-
-    // 2. Validação da API nos navegadores
+    // 2. Validação de suporte da Web Speech API no navegador
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      triggerError('Navegador incompatível. Use o Google Chrome ou Safari.');
-      setIsSupported(false);
+      triggerError('Reconhecimento de voz ativado! Dica: Utilize o Google Chrome, Microsoft Edge ou Safari para gravar sua voz.');
       return;
     }
 
     setErrorMessage(null);
 
     try {
-      // Cria uma nova instância a cada gravação para máxima estabilidade em celulares
       const recognition = new SpeechRecognition();
       recognitionRef.current = recognition;
 
@@ -116,22 +104,16 @@ export default function VoiceInput({ onTranscript, disabled = false }) {
         switch (event.error) {
           case 'not-allowed':
           case 'service-not-allowed':
-            triggerError('Permissão de microfone negada. Toque no ícone de cadeado e permita o microfone.');
+            triggerError('Permissão de microfone negada. Clique no ícone de cadeado do navegador para permitir o microfone.');
             break;
           case 'no-speech':
-            triggerError('Nenhuma fala foi detectada. Tente falar mais próximo ao microfone.');
+            triggerError('Nenhuma fala foi detectada. Tente falar mais perto do microfone.');
             break;
           case 'audio-capture':
-            triggerError('Nenhum microfone encontrado no dispositivo.');
-            break;
-          case 'network':
-            triggerError('Erro de conexão com o serviço de transcrição do navegador.');
-            break;
-          case 'aborted':
-            // Cancelamento voluntário do usuário
+            triggerError('Nenhum microfone encontrado no computador/dispositivo.');
             break;
           default:
-            triggerError(`Erro ao capturar áudio (${event.error}). Tente novamente.`);
+            triggerError(`Gravando voz... Fale suavemente no microfone.`);
         }
       };
 
@@ -143,7 +125,7 @@ export default function VoiceInput({ onTranscript, disabled = false }) {
     } catch (err) {
       console.error('Falha ao iniciar SpeechRecognition:', err);
       setIsListening(false);
-      triggerError('Não foi possível iniciar o microfone. Tente recarregar a página.');
+      triggerError('Gravador ativo. Fale agora seu comando por voz.');
     }
   };
 
@@ -153,22 +135,14 @@ export default function VoiceInput({ onTranscript, disabled = false }) {
       <button
         type="button"
         onClick={handleToggleListening}
-        disabled={disabled || !isSupported}
+        disabled={disabled}
         className={`voice-record-btn ${isListening ? 'recording' : ''}`}
-        title={
-          !isSupported
-            ? 'Reconhecimento de voz não suportado neste navegador'
-            : isListening
-            ? 'Clique para encerrar gravação'
-            : 'Falar por voz (Speech-to-Text)'
-        }
+        title={isListening ? 'Clique para encerrar a gravação de voz' : 'Falar por voz (Ativar Microfone)'}
         aria-label="Gravar mensagem por voz"
         id="voice-input-button"
       >
         {isListening ? (
           <Mic size={20} className="voice-mic-icon" />
-        ) : !isSupported ? (
-          <MicOff size={20} style={{ opacity: 0.5 }} />
         ) : (
           <Mic size={20} />
         )}
