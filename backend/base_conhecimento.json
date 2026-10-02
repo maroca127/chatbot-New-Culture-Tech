@@ -1,0 +1,78 @@
+{
+  "empresa": "Neo Culture Tech",
+  "descricao": "A Neo Culture Tech é a plataforma e hub comunitário definitivo para fãs de K-pop. Oferecemos busca interativa por ídolos e grupos, catálogo completo de músicas, discografias e álbuns lançados, letras sincronizadas com traduções, acervo de vídeo-clipes e trechos marcantes, galeria de fotos e suporte tira-dúvidas sobre o universo e cultura dos fandoms.",
+  "topicos": [
+    {
+      "id": "idolos_e_grupos",
+      "perguntas_chave": [
+        "Como procurar ídolos e integrantes de grupos de K-pop?",
+        "Quem são os integrantes do meu grupo favorito?",
+        "Como buscar informações sobre idols?",
+        "Quem é o líder ou vocalista do grupo?",
+        "Como encontrar biografia e curiosidades de um idol?"
+      ],
+      "resposta": "✨ **Busca de Ídolos & Grupos de K-pop**\n\nEncontre informações detalhadas sobre seus grupos e idols favoritos:\n\n* 🎤 **Perfis dos Integrantes:** Pesquise pelo nome do grupo ou integrante para ver posição (vocalista, dancer, rapper, líder, maknae), data de nascimento, signo e curiosidades.\n* 🌟 **Linha do Tempo & Estreia (Debut):** Descubra o ano de debut, agência responsável, nome do fandom oficial e cor oficial do grupo.\n* 🔍 **Como Pesquisar:** Digite no chat frases como *\"Quem são os membros do NCT?\"* ou *\"Informações sobre a Karina do aespa\"*!"
+    },
+    {
+      "id": "musicas_e_discografia",
+      "perguntas_chave": [
+        "Como procurar músicas e discografias?",
+        "Como encontrar faixas e discografia completa de um grupo?",
+        "Onde ouvir lançamentos e title tracks de K-pop?",
+        "Como buscar faixas B-Side?",
+        "Quais são as músicas mais tocadas de K-pop?"
+      ],
+      "resposta": "🎧 **Músicas & Discografias Completas**\n\nNavegue pelo acervo musical completo de todas as gerações do K-pop:\n\n* 🎵 **Title Tracks & B-Sides:** Encontre singles principais (*Title Tracks*), faixas secundárias (*B-Sides*) e colaborações especiais.\n* 📀 **Busca por Era ou Conceito:** Pesquise por era conceitual ou ano de lançamento das músicas.\n* 🚀 **Lançamentos & Comebacks:** Fique por dentro dos lançamentos diários e das paradas musicais (Melon, Circle Chart, Billboard K-Pop 100)."
+    },
+    {
+      "id": "letras_e_traducoes",
+      "perguntas_chave": [
+        "Como procurar letras de músicas de K-pop?",
+        "Onde encontrar a tradução das músicas para português?",
+        "Como ver a romanização (pronúncia) da letra?",
+        "Como cantar junto em coreano?",
+        "As letras são sincronizadas?"
+      ],
+      "resposta": "🎤 **Letras, Tradução & Romanização**\n\nCante e entenda a mensagem de cada verso em tempo real:\n\n* 📜 **Tradução Tripla:** Visualização simultânea em **Hangul (Coreano)**, **Romanização (Pronúncia)** e **Tradução em Português**.\n* 🎙️ **Modo Sing-Along:** Acompanhe a letra linha por linha enquanto ouve a música ou assiste ao clipe.\n* 💡 **Pesquisa por Trecho:** Escreveu um pedaço da letra no chat? Nossa IA identifica o nome da música e o grupo correspondente na hora!"
+    },
+    {
+      "id": "videoclipes_e_trechos",
+      "perguntas_chave": [
+        "Como procurar vídeo-clipes (MVs) de K-pop?",
+        "Como assistir teasers e trechos curtos de vídeo-clipes?",
+        "Onde encontrar relances e shorts de MVs?",
+        "Como assistir aos Dance Practices e Fan-cams?",
+        "Como buscar vídeos de apresentações ao vivo?"
+      ],
+      "resposta": "🎬 **Vídeo-Clipes (MVs) & Trechos**\n\nAssista aos MVs oficiais, bastidores e trechos virais em alta definição:\n\n* 🎥 **MVs Oficiais & Teasers:** Assista aos Music Videos (MVs) completos de lançamento e teasers oficiais pré-comeback.\n* 💃 **Dance Practices & Fan-cams:** Veja os vídeos de treino de coreografia (*Dance Practice*) e foco individual nos integrantes (*Fancams*).\n* ✂️ **Trechos Curtos (Shorts/Reels):** Busque relances dos momentos mais marcantes e high notes dos MVs para compartilhar nas redes sociais!"
+    },
+    {
+      "id": "albuns_e_fotos",
+      "perguntas_chave": [
+        "Como ver álbuns lançados e versões físicas?",
+        "Onde encontrar fotos oficiais e photobooks?",
+        "Como ver photocards e concept photos?",
+        "Quais são as versões de cada álbum?",
+        "Como buscar fotos em alta resolução dos idols?"
+      ],
+      "resposta": "📸 **Álbuns Lançados & Galeria de Fotos**\n\nExplore o acervo visual e conceitual das produções de K-pop:\n\n* 💿 **Catálogo de Álbuns:** Veja fotos da embalagem, inclusões, photobooks e tracklists de álbuns físicos (Digipack, Photobook, Platform Version).\n* 🖼️ **Concept Photos:** Galeria de fotos conceituais em alta resolução divididas por comeback e integrante.\n* 🎴 **Guia de Photocards:** Consulte quais photocards oficiais acompanham cada versão de álbum lançada."
+    },
+    {
+      "id": "comunidade_e_duvidas",
+      "perguntas_chave": [
+        "Como tirar dúvidas sobre o universo K-pop?",
+        "O que significam os termos Bias, Ultimate e Comeback?",
+        "O que é Lightstick e Fandom?",
+        "Como tirar dúvidas sobre o nicho de K-pop?",
+        "Onde fazer perguntas sobre os idols e a cultura k-pop?"
+      ],
+      "resposta": "🎀 **Comunidade, Dúvidas & Dicionário K-Pop**\n\nTire qualquer dúvida sobre os termos, gírias e novidades do fandom:\n\n* 📖 **Dicionário K-Pop:** Entenda expressões como *Bias* (membro favorito), *Ultimate Bias* (favorito supremo), *Comeback* (novo lançamento), *All-Kill*, *Lightstick* e *Daesang*.\n* ❓ **Tira-Dúvidas Aberto:** Faça qualquer pergunta sobre regras de programas de TV, histórico de premiações (MAMA, MMA) ou curiosidades da cultura coreana.\n* 💬 **Chat Interativo:** Converse com nosso assistente inteligente a qualquer momento para aprender mais sobre o estilo musical!"
+    }
+  ],
+  "faq_rapido": [
+    "Como procurar ídolos e integrantes de grupos de K-pop?",
+    "Como procurar letras com tradução e romanização?",
+    "Onde encontrar vídeo-clipes (MVs) e trechos curtos?",
+    "O que significam termos como Bias, Ultimate e Comeback?"
+  ]
+}

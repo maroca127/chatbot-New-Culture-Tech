@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+  <defs>
+    <linearGradient id="favBowGrad" x1="2" y1="4" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stopColor="#fbcfe8" />
+      <stop offset="45%" stopColor="#f472b6" />
+      <stop offset="100%" stopColor="#ec4899" />
+    </linearGradient>
+    <linearGradient id="favKnotGrad" x1="10" y1="9" x2="14" y2="14" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stopColor="#ffffff" />
+      <stop offset="35%" stopColor="#fbcfe8" />
+      <stop offset="100%" stopColor="#db2777" />
+    </linearGradient>
+  </defs>
+  <path d="M10.8 12.8C9.2 16.2 6.8 19.5 4.5 21.5L7.2 20.2C8.8 17.5 10.2 14.5 11.2 12.8Z" fill="url(#favBowGrad)" stroke="#db2777" stroke-width="0.8" stroke-linejoin="round" />
+  <path d="M13.2 12.8C14.8 16.2 17.2 19.5 19.5 21.5L16.8 20.2C15.2 17.5 13.8 14.5 12.8 12.8Z" fill="url(#favBowGrad)" stroke="#db2777" stroke-width="0.8" stroke-linejoin="round" />
+  <path d="M11 11.2C6.8 4.2 2.2 7.8 2.2 11.2C2.2 14.2 6.2 14.5 11 12.2Z" fill="url(#favBowGrad)" stroke="#db2777" stroke-width="0.8" stroke-linejoin="round" />
+  <path d="M9.2 11.2C7.2 9.6 5.2 10.2 4.6 11.8" stroke="#ffffff" stroke-width="0.8" stroke-linecap="round" />
+  <path d="M13 11.2C17.2 4.2 21.8 7.8 21.8 11.2C21.8 14.2 17.8 14.5 13 12.2Z" fill="url(#favBowGrad)" stroke="#db2777" stroke-width="0.8" stroke-linejoin="round" />
+  <path d="M14.8 11.2C16.8 9.6 18.8 10.2 19.4 11.8" stroke="#ffffff" stroke-width="0.8" stroke-linecap="round" />
+  <ellipse cx="12" cy="11.6" rx="2.5" ry="2.3" fill="url(#favKnotGrad)" stroke="#db2777" stroke-width="0.8" />
+  <circle cx="11.2" cy="10.8" r="0.6" fill="#ffffff" />
+</svg>

@@ -1,0 +1,27 @@
+# Ambientes e Segredos
+.env
+.env.*
+*.env
+backend/.env
+frontend/.env
+frontend/.env.*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+*.pyc
+
+# Node & Frontend Build
+node_modules/
+dist/
+dist-ssr/
+.DS_Store
+*.local
+
+# IDE & Logs
+.vscode/
+.idea/
+*.log
